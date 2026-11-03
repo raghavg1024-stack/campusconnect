@@ -1,0 +1,4 @@
+import {getChatGPTUser} from '@/lib/auth';
+import {updatePassword} from '../actions';
+export const dynamic='force-dynamic';
+export default async function Reset({searchParams}:{searchParams:Promise<{error?:string}>}){const user=await getChatGPTUser(),q=await searchParams;return <main className="main-content"><section className="panel portal-form"><h1>Choose a new password</h1>{q.error&&<p className="portal-alert" role="alert">{q.error}</p>}{user?<form action={updatePassword}><label>New password<input name="password" type="password" required minLength={8} autoComplete="new-password"/></label><label>Confirm password<input name="confirm" type="password" required minLength={8} autoComplete="new-password"/></label><button className="btn primary full">Update password</button></form>:<p>Open the password reset link in your email, or <a className="text-link" href="/login/student?mode=recover">request a new link</a>.</p>}</section></main>}

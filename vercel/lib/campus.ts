@@ -1,6 +1,6 @@
 export type CampusEvent={id:string;owner_id:string;title:string;description:string;category:string;club:string;starts_at:string;location:string;capacity:number;mode:string;status:string;registered:number};
 export type Registration={id:string;event_id:string;user_id:string;name:string;email:string;checked_in:number;created_at:string};
-export type CampusState={events:CampusEvent[];registrations:Registration[];memberships:string[];viewer?:{id:string;name:string;email:string}|null;provider?:string;capabilities?:{checkIn:boolean;clubMembership:boolean;eventStatus:boolean;extendedEventFields:boolean;walkIn:boolean}};
+export type CampusState={events:CampusEvent[];registrations:Registration[];memberships:string[];viewer?:{id:string;name:string;email:string;role?:'student'|'organiser'|'admin'}|null;provider?:string;capabilities?:{checkIn:boolean;clubMembership:boolean;eventStatus:boolean;extendedEventFields:boolean;walkIn:boolean}};
 export const clubs=[
  {id:'tech',name:'Technology Society',category:'Technology',initials:'TS',description:'Build, learn, and explore what comes next. Workshops, hackathons, and conversations for curious minds.',color:'#eae8ff'},
  {id:'arts',name:'Creative Collective',category:'Arts & Culture',initials:'CC',description:'A home for campus artists, makers, performers, and anyone who sees things a little differently.',color:'#ffebdf'},
