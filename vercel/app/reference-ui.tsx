@@ -1,55 +1,11 @@
 'use client';
 import {useState} from 'react';
+import {Bell,Bookmark,Menu,Search,X} from 'lucide-react';
 import type {CampusEvent,Registration} from '@/lib/campus';
-export function ReferenceHeader({initials,active,search,onSearch,go}:{initials:string;active:string;search:string;onSearch:(v:string)=>void;go:(s:string)=>void}){return (<header className="reference-header docked full-width top-0 z-50 sticky bg-surface-container-lowest shadow-sm">
-<div className="flex justify-between items-center w-full px-6 lg:px-10 h-16 max-w-7xl mx-auto">
-
-<div className="flex items-center gap-6">
-<a className="text-headline-md font-headline-md font-extrabold text-primary flex items-center gap-2" href="#dashboard">
-<span className="w-8 h-8 rounded-lg bg-primary text-on-primary flex items-center justify-center text-label-lg font-label-lg shadow-sm">
-<span className="material-symbols-outlined text-[20px]" data-icon="school">school</span>
-</span>
-<span>CampusConnect</span>
-</a>
-
-<div className="hidden lg:flex items-center relative w-64">
-<span className="material-symbols-outlined absolute left-3 text-outline text-[18px]" data-icon="search">search</span>
-<input className="w-full pl-9 pr-3 py-1.5 text-body-sm font-body-sm bg-surface-container-low border border-outline-variant/60 rounded-full focus:bg-surface-container-lowest focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-outline" aria-label="Search events and clubs" value={search} onChange={e=>onSearch(e.target.value)} placeholder="Search events, clubs..." type="text"/>
-</div>
-</div>
-
-<nav className="hidden md:flex items-center space-x-6">
-<a className="text-on-surface-variant hover:text-primary transition-colors text-label-md font-label-md" href="#events">Discover Events</a>
-<a className="text-on-surface-variant hover:text-primary transition-colors text-label-md font-label-md" href="#calendar">Campus Calendar</a>
-<a className="text-on-surface-variant hover:text-primary transition-colors text-label-md font-label-md" href="#rewards">Reward Points</a>
-<a className={active==="my"||active==="dashboard"||active==="attendees"?"text-primary font-bold border-b-2 border-primary pb-1 text-label-md font-label-md":"text-on-surface-variant hover:text-primary transition-colors text-label-md font-label-md"} href="#my">My RSVPs &amp; Clubs</a>
-</nav>
-
-<div className="flex items-center gap-3">
-
-<span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed text-label-sm font-label-sm font-bold">
-<span className="material-symbols-outlined text-[14px]" data-icon="verified">verified</span>
-          Organizer
-        </span>
-
-<button className="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors relative" title="Notifications" onClick={()=>go("notifications")}>
-<span className="material-symbols-outlined" data-icon="notifications">notifications</span>
-<span className="w-2 h-2 rounded-full bg-tertiary-container absolute top-1.5 right-1.5 ring-2 ring-surface-container-lowest"></span>
-</button>
-<button className="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors hidden sm:block" title="Saved Bookmarks" onClick={()=>go("saved")}>
-<span className="material-symbols-outlined" data-icon="bookmark">bookmark</span>
-</button>
-<a className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-primary text-on-primary text-label-md font-label-md font-semibold hover:bg-primary-container active:scale-[0.98] transition-all shadow-sm" href="#create">
-<span className="material-symbols-outlined text-[16px]" data-icon="add">add</span>
-<span>Create Event</span>
-</a>
-
-<div className="flex items-center gap-2 pl-2 border-l border-outline-variant/50">
-<a href="#account" aria-label="Your account" className="w-9 h-9 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold ring-2 ring-primary/20">{initials}</a>
-</div>
-</div>
-</div>
-</header>)}
+export function ReferenceHeader({initials,active,search,onSearch,go}:{initials:string;active:string;search:string;onSearch:(v:string)=>void;go:(s:string)=>void}){
+ const [menu,setMenu]=useState(false);const links=[['events','Discover Events'],['calendar','Campus Calendar'],['rewards','Reward Points'],['my','My RSVPs & Clubs']];
+ return <header className="reference-header stitch-header"><div className="stitch-header-inner"><a className="stitch-brand" href="#events"><span>CC</span>CampusConnect</a><div className="stitch-header-search"><Search size={17}/><input aria-label="Search events and clubs" placeholder="Search events, workshops, clubs…" value={search} onChange={e=>onSearch(e.target.value)}/></div><nav aria-label="Main navigation">{links.map(([key,label])=><a key={key} className={active===key||key==='events'&&active==='event'?'active':''} href={'#'+key}>{label}</a>)}</nav><div className="stitch-header-actions"><button className="icon-btn" aria-label="Notifications" onClick={()=>go('notifications')}><Bell size={20}/></button><button className="icon-btn stitch-saved" aria-label="Saved events" onClick={()=>go('saved')}><Bookmark size={20}/></button><a className="btn primary stitch-create" href="#create"><span>＋</span>Create Event</a><a className="stitch-account" href="#account" aria-label="Your account">{initials}</a><button className="icon-btn stitch-menu-toggle" aria-label="Open navigation" aria-expanded={menu} onClick={()=>setMenu(!menu)}>{menu?<X size={20}/>:<Menu size={20}/>}</button></div></div>{menu&&<nav className="stitch-mobile-nav" aria-label="Mobile navigation">{[...links,['create','Create Event'],['organiser','Organiser workspace']].map(([key,label])=><a key={key} href={'#'+key} onClick={()=>setMenu(false)}>{label}</a>)}</nav>}</header>
+}
 export function ReferenceFooter(){return (<footer className="reference-footer docked full-width bg-surface-container-lowest mt-12 border-t border-outline-variant/30">
 <div className="w-full py-8 px-6 lg:px-10 max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
 <div className="flex flex-col sm:flex-row items-center gap-3 text-center sm:text-left">
