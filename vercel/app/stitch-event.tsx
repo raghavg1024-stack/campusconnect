@@ -1,6 +1,7 @@
 'use client';
 import type {ReactNode} from 'react';
 import {ArrowLeft,ArrowUpRight,Bookmark,CalendarDays,CheckCircle2,GraduationCap,Info,MapPin,Share2,ShieldCheck,Sparkles,Ticket,Users} from 'lucide-react';
+import {eventCover} from '@/lib/event-cover';
 import {clubs,type CampusEvent} from '@/lib/campus';
 
 type Props={event:CampusEvent;saved:boolean;onSave:()=>void;onShare:()=>void;onCalendar:()=>void;registration:ReactNode;owner:boolean;attendanceAvailable:boolean};
@@ -13,7 +14,7 @@ export function StitchEvent({event,saved,onSave,onShare,onCalendar,registration,
   <a className="stitch-back" href="#events"><ArrowLeft size={16}/>Back to events</a>
   <div className="stitch-hero-grid">
    <section className="stitch-visual">
-    <div className="stitch-photo"><img src="/images/campus-gathering.jpg" alt="Students collaborating in a campus lecture hall" fetchPriority="high"/><div className="stitch-tags"><span>{event.category}</span><span>Campus event</span></div><div className="stitch-photo-caption"><span><Users size={17}/>Hosted by {host?.name||'Campus Community'}</span><span className="stitch-campus-tag"><GraduationCap size={15}/>CampusConnect</span></div></div>
+    <div className="stitch-photo"><img src={eventCover(event.title)} alt="AI-generated campus event illustration" fetchPriority="high"/><div className="stitch-tags"><span>{event.category}</span><span>Campus event</span></div><div className="stitch-photo-caption"><span><Users size={17}/>Hosted by {host?.name||'Campus Community'}</span><span className="stitch-campus-tag"><GraduationCap size={15}/>CampusConnect</span></div></div>
     <div className="stitch-social"><span className="stitch-attending"><span className="stitch-people"><Users size={18}/></span><strong>{event.registered}</strong> students registered</span><span><Ticket size={16}/>Free campus gathering</span></div>
    </section>
    <section className="stitch-summary stitch-panel">
