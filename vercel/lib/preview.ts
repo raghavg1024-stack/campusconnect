@@ -3,7 +3,7 @@ export type PreviewState=CampusState&{attendees:Registration[]};
 export const previewUser={id:'preview-student',name:'Preview Student',email:'student@example.test'};
 export function initialPreview():PreviewState{
  const now=new Date();const events:CampusEvent[]=samples.map((s,i)=>{const date=new Date(now);date.setDate(date.getDate()+s.days);date.setHours(s.hour,0,0,0);return {id:'demo-'+i,owner_id:previewUser.id,title:s.title,description:s.description,category:s.category,club:s.club,starts_at:date.toISOString(),location:s.location,capacity:s.capacity,mode:s.mode,status:'published',registered:i===0?23:0}});
- const attendees:Registration[]=Array.from({length:23},(_,i)=>({id:'demo-pass-'+(i+1),event_id:'demo-0',user_id:'demo-person-'+i,name:'Demo Student '+String(i+1).padStart(2,'0'),email:'student'+String(i+1).padStart(2,'0')+'@example.test',checked_in:i<14?1:0,created_at:new Date(now.getTime()-i*3600000).toISOString()}));
+ const attendees:Registration[]=Array.from({length:23},(_,i)=>({id:'demo-pass-'+(i+1),event_id:'demo-0',user_id:'demo-person-'+i,name:'Preview Student '+String(i+1).padStart(2,'0'),email:'student'+String(i+1).padStart(2,'0')+'@example.test',checked_in:i<14?1:0,created_at:new Date(now.getTime()-i*3600000).toISOString()}));
  return {events,attendees,registrations:[],memberships:[]};
 }
 export function mutatePreview(state:PreviewState,body:Record<string,unknown>):PreviewState{
