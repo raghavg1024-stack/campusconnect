@@ -1,0 +1,18 @@
+name: Validate CampusConnect
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: node node_modules/typescript/bin/tsc --noEmit
+      - run: node scripts/check-campus.cjs
+      - run: node scripts/check-supabase-model.cjs
+      - run: npm run build
