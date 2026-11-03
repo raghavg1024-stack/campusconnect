@@ -1,0 +1,5 @@
+'use server';
+import {authClient} from '@/lib/auth';import {redirect} from 'next/navigation';
+export async function signIn(data:FormData){const email=String(data.get('email')||'').trim(),password=String(data.get('password')||'');const client=await authClient();const {error}=await client.auth.signInWithPassword({email,password});if(error)redirect('/login?error=Sign-in%20failed.%20Check%20your%20email%20and%20password.');redirect('/#events');}
+export async function signUp(data:FormData){const email=String(data.get('email')||'').trim(),password=String(data.get('password')||'');if(password.length<8)redirect('/login?error=Use%20at%20least%208%20characters.');const client=await authClient();const {data:result,error}=await client.auth.signUp({email,password});if(error)redirect('/login?error=Account%20creation%20failed.%20Please%20try%20again.');if(result.session)redirect('/#events');redirect('/login?message=Check%20your%20email%20to%20confirm%20your%20account%2C%20then%20return%20here%20to%20sign%20in.');}
+export async function signOut(){const client=await authClient();await client.auth.signOut();redirect('/');}
