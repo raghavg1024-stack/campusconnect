@@ -14,11 +14,11 @@ async function rest<T>(path:string,method='GET',body?:unknown):Promise<T>{
 }
 async function all<T>(table:string,select:string,filter=''):Promise<T[]>{const result:T[]=[];for(let offset=0;offset<100000;offset+=1000){const rows=await rest<T[]>(`${table}?select=${select}${filter}&limit=1000&offset=${offset}`);result.push(...rows);if(rows.length<1000)return result;}throw new BackendError('This dataset is too large to load in one response.',413)}
 async function profile(user:Identity,create=false):Promise<UserRow>{
- const matches=await rest<UserRow[]>('USER?select=id,email,role&email=eq.'+encodeURIComponent(user.email.toLowerCase())+'&limit=2');
- if(matches.length>1)throw new BackendError('Your email matches multiple student records. Contact the campus administrator.',409);
+ const matches=await rest<UserRow[]>('USER?select=id,email,role&id=eq.'+encodeURIComponent(user.userId)+'&limit=1');
  if(matches[0])return {...matches[0],role:user.role};
- const hash=new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode('campusconnect:'+user.userId)));hash[6]=(hash[6]&15)|80;hash[8]=(hash[8]&63)|128;const h=Array.from(hash.slice(0,16),b=>b.toString(16).padStart(2,'0')).join('');const id=`${h.slice(0,8)}-${h.slice(8,12)}-${h.slice(12,16)}-${h.slice(16,20)}-${h.slice(20)}`;
- const value={id,email:user.email,role:user.role};if(create){const rows=await rest<UserRow[]>('USER','POST',value);return rows[0]}return value;
+ const value={id:user.userId,email:user.email,role:user.role};
+ if(create){const legacy=await rest<UserRow[]>('USER?select=id,email,role&email=eq.'+encodeURIComponent(user.email.toLowerCase())+'&limit=1');if(legacy.length)throw new BackendError('This email is linked to an older campus record. Contact college faculty to link your account securely.',409);const rows=await rest<UserRow[]>('USER','POST',value);return rows[0]}
+ return value;
 }
 async function eventById(id:string){if(!/^[0-9a-f-]{36}$/i.test(id))throw new BackendError('Invalid event ID.',400);const rows=await rest<EventRow[]>('Events?select=id,organiser_id,title,capacity,timestamp&id=eq.'+encodeURIComponent(id));if(!rows[0])throw new BackendError('Event not found.',404);return rows[0]}
 async function requireOwner(id:string,student:UserRow){const event=await eventById(id);if(student.role!=='organiser'&&student.role!=='admin')throw new BackendError('Approved organiser access is required.',403);if(event.organiser_id!==student.id)throw new BackendError('Only the event organiser can make this change.',403);return event}

@@ -10,4 +10,4 @@ export async function authClient(){
   }
  });
 }
-export async function getChatGPTUser(){if(!process.env.SUPABASE_URL||!process.env.SUPABASE_PUBLISHABLE_KEY)return null;const client=await authClient();const {data:{user},error}=await client.auth.getUser();if(error||!user?.email||!user.email_confirmed_at)return null;return {userId:user.id,email:user.email,displayName:user.email.split('@')[0],fullName:null,role:campusRole(user),requestedOrganiser:user.user_metadata?.requested_role==='organiser'};}
+export async function getChatGPTUser(){if(!process.env.SUPABASE_URL||!process.env.SUPABASE_PUBLISHABLE_KEY)return null;const client=await authClient();const {data:{user},error}=await client.auth.getUser();if(error||!user?.email)return null;return {userId:user.id,email:user.email,displayName:user.email.split('@')[0],fullName:null,role:campusRole(user),requestedOrganiser:user.user_metadata?.requested_role==='organiser'};}
