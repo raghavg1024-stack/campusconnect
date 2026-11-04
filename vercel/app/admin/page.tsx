@@ -1,14 +1,33 @@
-import {getChatGPTUser} from '@/lib/auth';
-import {authAdmin} from '@/lib/auth-admin';
-import {campusRole} from '@/lib/roles';
-import {redirect} from 'next/navigation';
-import {signOut} from '../login/actions';
-import {reviewAccess} from './actions';
-import type {User} from '@supabase/supabase-js';
-export const dynamic='force-dynamic';
-export default async function Admin({searchParams}:{searchParams:Promise<{error?:string;message?:string}>}){
- const actor=await getChatGPTUser();if(actor?.role!=='admin')redirect('/login/admin?error=Verified%20faculty%20access%20required.');const q=await searchParams,admin=authAdmin(),users:User[]=[];let failed=false;
- for(let page=1;page<=100;page++){const {data,error}=await admin.listUsers({page,perPage:100});if(error){failed=true;break}users.push(...data.users);if(data.users.length<100)break}
- const pending=users.filter(u=>u.email_confirmed_at&&campusRole(u)==='student'&&['faculty','organiser'].includes(u.user_metadata?.requested_role));const approved=users.filter(u=>u.id!==actor.userId&&campusRole(u)!=='student');
- return <main className="main-content"><a href="/#events" className="stitch-brand"><span>CC</span>CampusConnect</a><div className="page-heading" style={{marginTop:32}}><div><span className="eyebrow">VERIFIED COLLEGE FACULTY</span><h1>College administration</h1><p>Review requests against college records before granting access.</p></div><form action={signOut}><button className="btn">Sign out</button></form></div>{q.error&&<p className="portal-alert" role="alert">{q.error}</p>}{q.message&&<p className="portal-message" role="status">{q.message}</p>}{failed?<p className="portal-alert">Could not load access requests. Please refresh.</p>:<><section className="panel admin-panel"><h2>Pending verification ({pending.length})</h2>{pending.length?pending.map(u=><article className="access-request" key={u.id}><div><strong>{u.email}</strong><p>{u.user_metadata.requested_role==='faculty'?'Faculty administrator':'Event organiser'}</p>{u.user_metadata.requested_role==='faculty'&&<p>College: {String(u.user_metadata.faculty_college||'Not supplied')}<br/>Employee ID: {String(u.user_metadata.faculty_employee_id||'Not supplied')}</p>}</div><form action={reviewAccess}><input type="hidden" name="userId" value={u.id}/><input type="hidden" name="decision" value={u.user_metadata.requested_role==='faculty'?'faculty':'organiser'}/>{u.user_metadata.requested_role==='faculty'&&<label className="checkbox-label"><input type="checkbox" name="verified" value="yes" required/>I verified this person’s faculty identity and employee ID against official college records.</label>}<button className="btn primary">Approve {u.user_metadata.requested_role==='faculty'?'verified faculty':'organiser'}</button></form></article>):<p>No confirmed accounts are awaiting approval.</p>}</section><section className="panel admin-panel"><h2>Approved access ({approved.length})</h2>{approved.map(u=><article className="access-request" key={u.id}><div><strong>{u.email}</strong><p>{campusRole(u)==='admin'?'Verified faculty administrator':'Event organiser'}</p></div><form action={reviewAccess}><input type="hidden" name="userId" value={u.id}/><button className="btn" name="decision" value="revoke">Revoke elevated access</button></form></article>)}</section></>}<a href="/#organiser" className="btn" style={{marginTop:24}}>Your event workspace</a></main>;
+import { getChatGPTUser } from '@/lib/auth';
+import { authAdmin } from '@/lib/auth-admin';
+import { campusRole } from '@/lib/roles';
+import { redirect } from 'next/navigation';
+import { signOut } from '../login/actions';
+import { reviewAccess } from './actions';
+import type { User } from '@supabase/supabase-js';
+export const dynamic = 'force-dynamic';
+export default async function Admin({ searchParams }: {
+    searchParams: Promise<{
+        error?: string;
+        message?: string;
+    }>;
+}) {
+    const actor = await getChatGPTUser();
+    if (actor?.role !== 'admin')
+        redirect('/login/admin?error=Verified%20faculty%20access%20required.');
+    const q = await searchParams, admin = authAdmin(), users: User[] = [];
+    let failed = false;
+    for (let page = 1; page <= 100; page++) {
+        const { data, error } = await admin.listUsers({ page, perPage: 100 });
+        if (error) {
+            failed = true;
+            break;
+        }
+        users.push(...data.users);
+        if (data.users.length < 100)
+            break;
+    }
+    const pending = users.filter(u => u.email_confirmed_at && campusRole(u) === 'student' && ['faculty', 'organiser'].includes(u.user_metadata?.requested_role));
+    const approved = users.filter(u => u.id !== actor.userId && campusRole(u) !== 'student');
+    return <main className="main-content"><a href="/#events" className="stitch-brand"><span>CC</span>CampusConnect</a><div className="page-heading" style={{ marginTop: 32 }}><div><span className="eyebrow">VERIFIED COLLEGE FACULTY</span><h1>College administration</h1><p>Review requests against college records before granting access.</p></div><form action={signOut}><button className="btn">Sign out</button></form></div>{q.error && <p className="portal-alert" role="alert">{q.error}</p>}{q.message && <p className="portal-message" role="status">{q.message}</p>}{failed ? <p className="portal-alert">Could not load access requests. Please refresh.</p> : <><section className="panel admin-panel"><h2>Pending verification ({pending.length})</h2>{pending.length ? pending.map(u => <article className="access-request" key={u.id}><div><strong>{u.email}</strong><p>{u.user_metadata.requested_role === 'faculty' ? 'Faculty administrator' : 'Event organiser'}</p>{u.user_metadata.requested_role === 'faculty' && <p>College: {String(u.user_metadata.faculty_college || 'Not supplied')}<br />Employee ID: {String(u.user_metadata.faculty_employee_id || 'Not supplied')}</p>}</div><form action={reviewAccess}><input type="hidden" name="userId" value={u.id}/><input type="hidden" name="decision" value={u.user_metadata.requested_role === 'faculty' ? 'faculty' : 'organiser'}/>{u.user_metadata.requested_role === 'faculty' && <label className="checkbox-label"><input type="checkbox" name="verified" value="yes" required/>I verified this person’s faculty identity and employee ID against official college records.</label>}<button className="btn primary">Approve {u.user_metadata.requested_role === 'faculty' ? 'verified faculty' : 'organiser'}</button></form></article>) : <p>No confirmed accounts are awaiting approval.</p>}</section><section className="panel admin-panel"><h2>Approved access ({approved.length})</h2>{approved.map(u => <article className="access-request" key={u.id}><div><strong>{u.email}</strong><p>{campusRole(u) === 'admin' ? 'Verified faculty administrator' : 'Event organiser'}</p></div><form action={reviewAccess}><input type="hidden" name="userId" value={u.id}/><button className="btn" name="decision" value="revoke">Revoke elevated access</button></form></article>)}</section></>}<a href="/#organiser" className="btn" style={{ marginTop: 24 }}>Your event workspace</a></main>;
 }
